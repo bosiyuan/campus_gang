@@ -1,0 +1,7 @@
+
+“
+java:S1192'"KDefine a constant instead of duplicating this literal "student_id" 3 times.(ÄÒóÖøÿÿÿÿ8İ›ôÈè1J$1bd4b36e-bb72-4082-a638-c403af2d55b6
+‚
+java:S2441-":Make "User" serializable or don't store it in the session.(£™Õàûÿÿÿÿ8î›ôÈè1J$4042d5df-95ec-4cfc-a661-634bf99063c1
+›
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡¸Îùÿÿÿÿ8Ÿ£÷Èè1J$9fe66771-54ea-42ba-b4ce-9470d54cfa78
