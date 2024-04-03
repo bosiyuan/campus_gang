@@ -102,12 +102,12 @@ public class UserController {
         wrapper.eq(Task::getPublishId,id);
         List<Task> list = taskService.list(wrapper);
         if (!CollectionUtils.isEmpty(list)){
-            return message.message(false, "error,删除学生失败，该学生有发布的任务", "", null);
+            return message.message(false, "error,删除失败，该用户有已发布的任务", "", null);
         }
         wrapper.eq(Task::getAcceptId,id);
         List<Task> taskList = taskService.list(wrapper);
         if (!CollectionUtils.isEmpty(taskList)){
-            return message.message(false, "error,删除学生失败，该学生有接受的任务", "", null);
+            return message.message(false, "error,删除失败，该用户已接受任务", "", null);
         }
         boolean remove = userService.removeById(id);
         if (remove) {

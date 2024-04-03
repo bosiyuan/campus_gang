@@ -23,15 +23,19 @@
                         @click="handleUpdate(scope.$index, scope.row)">编辑
                     </el-button>
 
-                    <!-- <el-button
-                            icon="el-icon-delete"
-                            size="mini"
-                            type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">删除
-                    </el-button> -->
+                    <el-button class="hvr-push" icon="el-icon-delete" size="mini" type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                    </el-button>
 
                     <el-button class="hvr-push" icon="el-icon-setting" size="mini" @click="openTransferDialog">用户分配
                     </el-button>
+
+                    <el-dialog title="用户列表" :visible.sync="openTransferDialog">
+                        <el-transfer filterable :filter-method="filterMethod" filter-placeholder="请输入用户名称"
+                            v-model="value" :data="selectedData">
+                        </el-transfer>
+                    </el-dialog>
+
                 </template>
             </el-table-column>
 
@@ -59,10 +63,6 @@
 
         </el-table>
 
-        <el-transfer filterable :filter-method="filterMethod" filter-placeholder="请输入用户名称" v-model="value"
-            :data="roles">
-        </el-transfer>
-
     </div>
 </template>
 
@@ -78,6 +78,7 @@ export default {
             input: '',
             select: '1',
             form: {},
+            openTransferDialog:false,
             // Transfer 组件的数据源
             transferData: [],
             // Transfer 组件的已选项
@@ -86,38 +87,6 @@ export default {
     },
 
     methods: {
-
-        //用户分配弹窗
-        openTransferDialog() {
-            // 弹出 MessageBox 弹框
-            MessageBox({
-                title: '选择用户',
-                message: createElement('div', {}, [
-                    createElement(Transfer, {
-                        props: {
-                            // 传入 Transfer 组件的属性
-                            data: this.transferData,
-                            // 其他属性
-                        },
-                        // 监听 Transfer 组件的事件
-                        on: {
-                            // 监听事件
-                        }
-                    })
-                ]),
-                showCancelButton: true,
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                beforeClose: (action, instance, done) => {
-                    // 点击确定时的回调
-                    if (action === 'confirm') {
-                        // 处理选中的数据
-                        console.log('选中的数据:', this.selectedData);
-                    }
-                    done();
-                }
-            });
-        },
 
         clickSearch() {
             let parameter = {};
@@ -143,6 +112,9 @@ export default {
                 .then((res) => {
                     this.$notifyMsg("成功", res.data.msg, "success")
                     this.newList()
+                })
+                .catch((err) => {
+                    this.$notifyMsg("失败", res.data.msg, "error")
                 })
         },
 
@@ -185,8 +157,14 @@ export default {
             if (b.id != null) {
                 this.$del("/role/" + b.id)
                     .then((res) => {
-                        this.$notifyMsg("成功", res.data.msg, "success")
-                        this.newList()
+                        const { status, msg } = res.data
+                        if (status) {
+                            this.$notifyMsg("成功", msg, "success")
+                            this.newList()
+                            return
+                        } else {
+                            this.$notifyMsg("失败", msg, "error")
+                        }
                     })
             }
         },

@@ -25,8 +25,6 @@ public class RoleController {
     @Resource
     private RoleService roleService;
     @Resource
-    private UserRoleService userRoleService;
-    @Resource
     private UserService userService;
     @Resource
     private AdminService adminService;
@@ -80,13 +78,20 @@ public class RoleController {
     @DeleteMapping("/{id}")
     public Map<String, Object> delRole(@PathVariable Long id) {
         boolean remove;
-        LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(UserRole::getRoleid,id);
-        List<UserRole> list = userRoleService.list(wrapper);
-        if (CollectionUtils.isEmpty(list)) {
-            remove = roleService.removeById(id);
+        if (id == 1){
+            List<Admin> list = adminService.list();
+            if (CollectionUtils.isEmpty(list)) {
+                remove = roleService.removeById(id);
+            }else {
+                return message.message(false, "error,此角色已绑定用户", "", null);
+            }
         }else {
-            return message.message(false, "error,此角色已绑定用户", "", null);
+            List<User> list = userService.list();
+            if (CollectionUtils.isEmpty(list)) {
+                remove = roleService.removeById(id);
+            }else {
+                return message.message(false, "error,此角色已绑定用户", "", null);
+            }
         }
         if (remove) {
             return message.message(true, "删除角色成功", "", null);

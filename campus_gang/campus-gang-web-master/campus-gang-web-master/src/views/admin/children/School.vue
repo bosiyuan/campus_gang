@@ -173,24 +173,41 @@
             },
 
             handleDelete(a,b){
-                console.log(b);                
                 if(b.schoolId != null){
                     this.$del("/school/"+b.schoolId)
                     .then((res) => {
-                        this.$notifyMsg("成功", res.data.msg, "success")
-                        this.newList()
+                        const {status , msg} = res.data
+                            if(status){
+                                this.$notifyMsg("成功", res.data.msg, "success")
+                                this.newList()
+                                return
+                            }else{
+                                this.$notifyMsg("失败",msg,"error")
+                            }
                     })
                 }else if(b.deptsId != null){
                      this.$del("/dept/"+b.deptsId)
                         .then((res) => {
-                            this.$notifyMsg("成功", res.data.msg, "success")
-                            this.newList()
+                            const {status , msg} = res.data
+                            if(status){
+                                this.$notifyMsg("成功",msg, "success")
+                                this.newList()
+                                return
+                            }else{
+                                this.$notifyMsg("失败",msg,"error")
+                            }
                         })
                 }else{
                     this.$del("/class/"+b.classesId)
                         .then((res) => {
-                            this.$notifyMsg("成功", res.data.msg, "success")
-                            this.newList()
+                            const {status , msg} = res.data
+                            if(status){
+                                this.$notifyMsg("成功", res.data.msg, "success")
+                                this.newList()
+                                return
+                            }else{
+                                this.$notifyMsg("失败",msg,"error")
+                            }
                         })
                 }
             },
@@ -233,7 +250,6 @@
                 return this.schools.map(item => {
                     let depts = [];
                     for (let i = 0;i<item['depts'].length;i++){
-                        // console.log(item['depts'][i]['classes'])
                         depts.push(
                             {
                                 deptsId : item['depts'][i].id,
@@ -241,7 +257,6 @@
                                 uuid : this.guid2()
                             }
                         )
-                        // console.log(depts)
                         let children = [];
                         for (let j = 0;j<item['depts'][i]['classes'].length;j++){
                             children.push(

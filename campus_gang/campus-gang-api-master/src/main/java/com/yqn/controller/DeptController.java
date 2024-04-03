@@ -53,7 +53,7 @@ public class DeptController {
             return message.message(true, "添加系别成功", "", null);
         }
 
-        return message.message(true, "error, 该系已存在", "", null);
+        return message.message(false, "error, 该系已存在", "", null);
     }
 
     // 删除
@@ -63,12 +63,12 @@ public class DeptController {
         wrapper.eq(Class::getDeptId, id);
         List<Class> list = classService.list(wrapper);
         if (!CollectionUtils.isEmpty(list)){
-            return message.message(true, "error, 删除失败，系别下已有班级", "", null);
+            return message.message(false, "error, 删除失败，系别下已有班级", "", null);
         }
         boolean remove = deptService.removeById(id);
         if (remove) {
             return message.message(true, "删除成功", "", null);
         }
-        return message.message(true, "error, 删除失败", "", null);
+        return message.message(false, "error, 删除失败", "", null);
     }
 }
