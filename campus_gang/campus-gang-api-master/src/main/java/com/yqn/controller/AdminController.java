@@ -1,13 +1,14 @@
 package com.yqn.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.yqn.common.tools.MessageTools;
 import com.yqn.pojo.Admin;
 import com.yqn.service.AdminService;
-import com.yqn.common.tools.MessageTools;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,10 +17,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
-    @Autowired
+    @Resource
     private AdminService adminService;
 
-    @Autowired
+    @Resource
     private MessageTools message;
 
     @GetMapping
@@ -27,15 +28,11 @@ public class AdminController {
         QueryWrapper<Admin> wrapper = new QueryWrapper<>();
         wrapper.eq("account", account);
         wrapper.eq("password", password);
-
         Admin admin = adminService.getOne(wrapper);
         if (admin != null) {
             session.setAttribute("admin", admin);
-            // return message.message(true, admin);
             return message.message(true, "请求成功", "admin", admin);
         }
-
-        // return message.message(false, "账号或密码错误");
         return message.message(false, "账号或密码错误", "", null);
     }
 
@@ -50,9 +47,13 @@ public class AdminController {
 
     @DeleteMapping("/{id}")
     public Map<String, Object> delAdmin(@PathVariable Long id) {
+        List<Admin> list = adminService.list();
+        if (list.size() == 1 ){
+            return message.message(false, "管理员,删除失败，管理员全部删除后管理员页面将无法登录", "", null);
+        }
         boolean b = adminService.removeById(id);
         if (b) {
-            return message.message(true, "Admin,删除成功", "", null);
+            return message.message(true, "管理员,删除成功", "", null);
         }
         return message.message(false, "Admin,删除失败", "", null);
     }

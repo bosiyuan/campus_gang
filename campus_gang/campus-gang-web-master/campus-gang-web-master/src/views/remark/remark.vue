@@ -239,7 +239,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加remark";
+      this.title = "添加评价";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -248,7 +248,7 @@ export default {
       getRemark(id).then(response => {
         this.form = response.data.data;
         this.open = true;
-        this.title = "修改remark";
+        this.title = "修改评价";
       });
     },
     /** 提交按钮 */
@@ -274,7 +274,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除此学生', '提示', {
+      this.$confirm('是否确认删除此评价', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning',

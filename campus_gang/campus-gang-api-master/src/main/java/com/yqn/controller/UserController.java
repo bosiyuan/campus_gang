@@ -2,13 +2,14 @@ package com.yqn.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.yqn.pojo.Task;
-import com.yqn.pojo.User;
-import com.yqn.service.TaskService;
-import com.yqn.service.UserService;
 import com.yqn.common.tools.MessageTools;
 import com.yqn.common.tools.PocketMoney;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.yqn.pojo.Admin;
+import com.yqn.pojo.Task;
+import com.yqn.pojo.User;
+import com.yqn.service.AdminService;
+import com.yqn.service.TaskService;
+import com.yqn.service.UserService;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,8 @@ public class UserController {
     private PocketMoney money;
     @Resource
     private TaskService taskService;
+    @Resource
+    private AdminService adminService;
 
     // 检查登录
     @GetMapping("/login")
@@ -78,11 +81,27 @@ public class UserController {
         wrapper.eq("school_id", user.getSchoolId())
                 .eq("student_id", user.getStudentId());
         User one = userService.getOne(wrapper);
+        QueryWrapper<User> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("username",user.getUsername());
+        User byName = userService.getOne(wrapper1);
+        QueryWrapper<Admin> wrapper2 = new QueryWrapper<>();
+        wrapper2.eq("username",user.getUsername());
+        Admin admin = adminService.getOne(wrapper2);
+        LambdaQueryWrapper<Admin> wrapper3 = new LambdaQueryWrapper<>();
+        wrapper3.eq(Admin::getAccount,user.getStudentId());
+        Admin admin1 = adminService.getOne(wrapper3);
+        if (admin1 != null) {
+            return message.message(false, "error, 该用户已存在", "", null);
+        }
         if (one == null) {
+            if (byName!=null || admin!=null){
+                return message.message(false, "error, 该用户已存在", "", null);
+            }
             userService.save(user);
             return message.message(true, "注册成功", "", null);
+        }else {
+            return message.message(false, "error, 该学号已被注册", "", null);
         }
-        return message.message(false, "error, 该学号已被注册", "", null);
     }
 
     // 更新信息

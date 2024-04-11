@@ -27,13 +27,17 @@
                         @click="handleDelete(scope.$index, scope.row)">删除
                     </el-button>
 
-                    <el-button class="hvr-push" icon="el-icon-setting" size="mini" @click="openTransferDialog">用户分配
+                    <el-button class="hvr-push" icon="el-icon-setting" size="mini"
+                        @click="openTransferDialog(scope.$index, scope.row)">用户分配
                     </el-button>
 
-                    <el-dialog title="用户列表" :visible.sync="openTransferDialog">
-                        <el-transfer filterable :filter-method="filterMethod" filter-placeholder="请输入用户名称"
-                            v-model="value" :data="selectedData">
+                    <el-dialog title="用户列表" :visible.sync="dialogVisible" width="50%">
+                        <el-transfer v-model="selectedData" :titles="['所有用户列表', '选中用户列表']" :data="transferData" @change = "selectUsers">
                         </el-transfer>
+                        <span slot="footer" class="dialog-footer">
+                            <el-button @click=resetTransferData()>取消</el-button>
+                            <el-button @click=handleConfirm()>确定</el-button>
+                        </span>
                     </el-dialog>
 
                 </template>
@@ -78,15 +82,72 @@ export default {
             input: '',
             select: '1',
             form: {},
-            openTransferDialog:false,
+            dialogVisible: false,
+            // Transfer 组件的已选项
+            selectedData: [],
             // Transfer 组件的数据源
             transferData: [],
-            // Transfer 组件的已选项
-            selectedData: []
+            originalTransferData: [],
+            pojo: {},
+            // ids: ''
         }
     },
 
     methods: {
+
+        selectUsers(data){
+            this.selectedData =  data
+        },
+        //点击分配用户开启分配用户弹窗
+        openTransferDialog(a, b) {
+            this.dialogVisible = true;
+            //记录数据
+            this.pojo = b;
+            this.$get("/role/users/" + b.key).then((res) => {
+                this.transferData = res.data.users;
+                return this.transferData = this.transferData.map(entity => ({
+                    key: entity.id,
+                    label: entity.username
+                }))
+            });
+        },
+
+        //点击确认保存操作选中用户,进行权限分配做操作
+        handleConfirm() {
+            this.dialogVisible = false
+            let key = this.pojo.key
+            let ids = ''
+            for (let i = 0; i < this.selectedData.length; i++) {
+                if (i === 0) {
+                    ids += this.selectedData[i] + '';
+                } else {
+                    ids += ',' + this.selectedData[i];
+                }
+            }
+            this.$post("/role/" + key + "/" + ids).then((res) => {
+                const { status, msg } = res.data
+                if (status) {
+                    this.$notifyMsg("成功", msg, "success")
+                    this.newList()
+                    return
+                } else {
+                    this.$notifyMsg("失败", msg, "error")
+                }
+            })
+            this.selectedData = []
+        },
+
+        created() {
+            // 保存原始数据副本
+            this.originalTransferData = [...this.transferData];
+        },
+
+        resetTransferData() {
+            this.dialogVisible = false
+            // 重置 Transfer 数据为原始数据
+            this.transferData = [...this.originalTransferData];
+            this.selectedData = []
+        },
 
         clickSearch() {
             let parameter = {};
@@ -119,7 +180,6 @@ export default {
         },
 
         edit(row) {
-            // console.log(row.state)
             if (row.state == 0) {
                 row.state = 1;
             } else {
@@ -127,7 +187,6 @@ export default {
             }
             this.$put("/role", { id: row.id, state: row.state })
                 .then((res) => {
-                    // this.$msg(res.data.msg, "success")
                     this.$notifyMsg("成功", res.data.msg, "success")
                     this.newList()
                 })
@@ -139,7 +198,7 @@ export default {
         //编辑角色
         /** 修改按钮操作 */
         handleUpdate(a, b) {
-            // console.log(b);
+            this.reset();
             this.$get("/role/" + b.id).then((res) => {
                 this.form = res.data.role;
                 this.open = true;
@@ -150,6 +209,7 @@ export default {
         // 取消按钮
         cancel() {
             this.open = false;
+            resetTransferData();
         },
 
         //删除角色
@@ -168,10 +228,6 @@ export default {
                     })
             }
         },
-
-        //分配权限
-
-
 
         newList() {
             this.$get("/role")
@@ -208,5 +264,9 @@ export default {
 <style scoped lang="less">
 .content {
     padding: 0 1%;
+}
+
+.dialog-footer {
+    text-align: center;
 }
 </style>
