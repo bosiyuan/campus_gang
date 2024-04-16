@@ -13,11 +13,11 @@
 
         <div class="bottom">
             <el-table :data="users" :resizable="false" style="width: 100%  ">
-                <el-table-column prop="studentId" label="学号" min-width="140">
+                <el-table-column prop="studentId" label="学号" min-width="120">
                 </el-table-column>
-                <el-table-column prop="username" label="姓名" min-width="120">
+                <el-table-column prop="username" label="姓名" min-width="100">
                 </el-table-column>
-                <el-table-column prop="phone" label="手机号" min-width="110">
+                <el-table-column prop="phone" label="手机号" min-width="130">
                 </el-table-column>
 
                 <el-table-column label="性别" min-width="60">
@@ -26,13 +26,13 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="school.name" label="学校" min-width="200">
+                <el-table-column prop="school.name" label="学校" min-width="150">
                 </el-table-column>
-                <el-table-column prop="dept.name" label="所在系" min-width="100">
+                <el-table-column prop="dept.name" label="所在系" min-width="130">
                 </el-table-column>
-                <el-table-column prop="aclass.name" label="班级" min-width="150">
+                <el-table-column prop="aclass.name" label="班级" min-width="130">
                 </el-table-column>
-                <el-table-column prop="balance" label="余额" min-width="50">
+                <el-table-column prop="balance" label="余额" min-width="60">
                 </el-table-column>
                 <el-table-column label="禁用用户" min-width="90">
                     <template slot-scope="scope">

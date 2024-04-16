@@ -89,7 +89,6 @@ export default {
             transferData: [],
             originalTransferData: [],
             pojo: {},
-            // ids: ''
         }
     },
 
